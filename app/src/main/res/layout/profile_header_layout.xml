@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:background="#cedaed">
+
+        <de.hdodenhof.circleimageview.CircleImageView android:id="@+id/profile_header_user_icon"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/profpic"/>
+
+        <TextView android:id="@+id/profile_header_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Luthfi Soehadak"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_below="@id/profile_header_user_icon"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="5dp"/>
+
+        <TextView android:id="@+id/profile_header_user_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="food enthusiast. travel lover"
+            android:textSize="14sp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/profile_header_user_name"
+            android:layout_marginBottom="5dp"/>
+
+        <TextView android:id="@+id/profile_header_user_post_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="25 events"
+            android:textSize="14sp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/profile_header_user_info"
+            android:layout_marginBottom="30dp"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
