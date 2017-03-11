@@ -1,17 +1,40 @@
 package com.jaktopia.tiramisu.jaktopia.ProfileAndTimelineRecycler;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.jaktopia.tiramisu.jaktopia.CommentActivity;
+import com.jaktopia.tiramisu.jaktopia.Interface.IVolleyCallBack;
 import com.jaktopia.tiramisu.jaktopia.ObjectClass.Event;
+import com.jaktopia.tiramisu.jaktopia.PeekProfileActivity;
 import com.jaktopia.tiramisu.jaktopia.R;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static android.view.View.GONE;
 
@@ -19,10 +42,16 @@ import static android.view.View.GONE;
  * Created by lsoehadak on 2/19/17.
  */
 
-public class TimelineRecyclerAdapter extends RecyclerView.Adapter<VHEventitem> {
+public class TimelineRecyclerAdapter extends RecyclerView.Adapter<VHEventItem> implements IVolleyCallBack {
     Context mContext;
     LayoutInflater inflater;
     List<Event> events = new ArrayList<Event>();
+
+    String favoritePostReqUrl;
+    RequestQueue requestQueue;
+
+    int clickedItemPosition;
+    VHEventItem clickedHolder;
 
     public TimelineRecyclerAdapter(Context mContext, List<Event> events) {
         this.mContext = mContext;
@@ -31,59 +60,261 @@ public class TimelineRecyclerAdapter extends RecyclerView.Adapter<VHEventitem> {
     }
 
     @Override
-    public VHEventitem onCreateViewHolder(ViewGroup parent, int viewType) {
+    public VHEventItem onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.event_timeline_layout, parent, false);
-        return new VHEventitem(view);
+        return new VHEventItem(view);
     }
 
     @Override
-    public void onBindViewHolder(VHEventitem holder, int position) {
+    public void onBindViewHolder(final VHEventItem holder, final int position) {
         /* set user icon */
-        // user profpict get from url <Picasso>
+        if(!events.get(position).getUserIconUrl().equals("null"))
+            Picasso.with(mContext).load(events.get(position).getUserIconUrl()).placeholder(R.drawable.loading_image_animation).
+                    into(holder.userIconImg);
+
         /* set category icon */
-        if(events.get(position).getCategoryName() == "Accident")
+        if(events.get(position).getCategoryName().equals("Accident"))
             holder.categoryIconImg.setImageResource(R.drawable.ic_category_accident);
-        else if(events.get(position).getCategoryName() == "Food")
+        else if(events.get(position).getCategoryName().equals("Food"))
             holder.categoryIconImg.setImageResource(R.drawable.ic_category_food);
-        else if(events.get(position).getCategoryName() == "Education")
+        else if(events.get(position).getCategoryName().equals("Education"))
             holder.categoryIconImg.setImageResource(R.drawable.ic_category_education);
-        else if(events.get(position).getCategoryName() == "Sport")
+        else if(events.get(position).getCategoryName().equals("Sport"))
             holder.categoryIconImg.setImageResource(R.drawable.ic_category_sport);
-        else if(events.get(position).getCategoryName() == "Traffic")
+        else if(events.get(position).getCategoryName().equals("Traffic"))
             holder.categoryIconImg.setImageResource(R.drawable.ic_category_traffic);
-        else if(events.get(position).getCategoryName() == "Entertainment")
+        else if(events.get(position).getCategoryName().equals("Entertainment"))
             holder.categoryIconImg.setImageResource(R.drawable.ic_category_entertainment);
+
         /* set event name */
         holder.eventNameTxt.setText(events.get(position).getEventName());
         /* set category name and event location */
-        holder.categoryNameAndLocationTxt.setText(events.get(position).getCategoryName() + " at " + events.get(position).getLocation());
+        if (Build.VERSION.SDK_INT >= 24) {
+            holder.categoryNameAndLocationTxt.setText(Html.fromHtml(
+                    "<font face=\"sans-serif-light\">"
+                        + events.get(position).getCategoryName()
+                        + " at "
+                        + "</font>"
+                        + "<font face=\"sans-serif-medium\">"
+                        + events.get(position).getLocation()
+                        + "</font>", Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            holder.categoryNameAndLocationTxt.setText(Html.fromHtml(
+                    "<font face=\"sans-serif-light\">"
+                        + events.get(position).getCategoryName()
+                        + " at "
+                        + "</font>"
+                        + "<font face=\"sans-serif-medium\">"
+                        + events.get(position).getLocation()
+                        + "</font>"));
+        }
         /* set post time */
         long time = System.currentTimeMillis()/1000 - events.get(position).getPostTime();
         holder.postTimeTxt.setText("5 minutes ago");
+
         /* set event photo */
-        if(events.get(position).getPhotoUrl() != "") {
-            // get photo using picasso
+        if(!events.get(position).getPhotoUrl().equals("null")) {
+            Picasso.with(mContext).load(events.get(position).getPhotoUrl()).placeholder(R.drawable.loading_place_holder).
+                    into(holder.eventPhotoImg);
         } else {
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(0,0);
-            params.setMargins(0,0,0,0);
-            holder.eventPhotoImg.setLayoutParams(params);
+            holder.eventPhotoImg.getLayoutParams().width = 0;
+            holder.eventPhotoImg.getLayoutParams().height = 0;
+            RelativeLayout.MarginLayoutParams layoutParams = (RelativeLayout.MarginLayoutParams)holder.eventPhotoImg.getLayoutParams();
+            layoutParams.setMargins(0,0,0,0);
+            holder.eventPhotoImg.setLayoutParams(layoutParams);
+            holder.eventPhotoImg.setImageResource(android.R.color.transparent);
         }
+
+        /* set favorite button icon */
+        if(events.get(position).getIsFavorite() == 0)
+            holder.favoriteIconBtn.setBackgroundResource(R.drawable.ic_like);
+        else
+            holder.favoriteIconBtn.setBackgroundResource(R.drawable.ic_like_on_click);
+
         /* set favorite count */
         holder.favoriteCountTxt.setText(events.get(position).getFavoriteCount() + " favorites");
         /* set user caption */
-        holder.posterCaptionTxt.setText(events.get(position).getFirstName() + " " + events.get(position).getCaption());
+        if (Build.VERSION.SDK_INT >= 24) {
+            holder.posterCaptionTxt.setText(Html.fromHtml(
+                    "<font face=\"sans-serif-medium\">"
+                        + "<b>"
+                        + events.get(position).getFirstName()
+                        + " "
+                        + "</font>"
+                        + "</b>"
+                        + "<font face=\"sans-serif-light\">"
+                        + events.get(position).getCaption()
+                        + "</font>", Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            holder.posterCaptionTxt.setText(Html.fromHtml(
+                    "<font face=\"sans-serif-medium\">"
+                        + "<b>"
+                        + events.get(position).getFirstName()
+                        + " "
+                        + "</font>"
+                        + "</b>"
+                        + "<font face=\"sans-serif-light\">"
+                        + events.get(position).getCaption()
+                        + "</font>"));
+        }
+
         /* set comment if there any */
-        //holder.commentTxt.setText();
-        holder.commentTxt.setVisibility(GONE);
-        /* set more comment if there any */
+        if(events.get(position).getLastComment().size() > 0) {
+            for (Map.Entry<String, String> entry : events.get(position).getLastComment().entrySet()) {
+                holder.commentTxt.setText(entry.getKey() + " " + entry.getValue());
+            }
+        } else
+            holder.commentTxt.setVisibility(GONE);
+
+        /* set more comment icon */
         if(events.get(position).getMoreCommentCount() > 0)
-            holder.moreCommentTxt.setText(events.get(position).getMoreCommentCount() + " more comments");
+            holder.moreIconImg.setVisibility(View.VISIBLE);
         else
+            holder.moreIconImg.setVisibility(GONE);
+
+        /* set more comment if there any */
+        if(events.get(position).getMoreCommentCount() > 0) {
+            holder.moreCommentTxt.setText(events.get(position).getMoreCommentCount() + " more comments");
+            holder.moreCommentTxt.setVisibility(View.VISIBLE);
+        }
+        else {
             holder.moreCommentTxt.setVisibility(GONE);
+        }
+
+        /* set listener to profile picture */
+        holder.userIconImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, PeekProfileActivity.class);
+                intent.putExtra("user_id", events.get(position).getUserId());
+                mContext.startActivity(intent);
+            }
+        });
+
+        /* set listener to comment card view */
+        holder.commentCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, CommentActivity.class);
+                intent.putExtra("event_id", events.get(position).getEventId());
+                mContext.startActivity(intent);
+            }
+        });
+
+        /* set listener to favorite button and text  */
+        holder.favoriteIconBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickedItemPosition = position;
+                clickedHolder = holder;
+                if(events.get(position).getIsFavorite() == 0) {
+                    events.get(position).setIsFavorite(1);
+                    holder.favoriteIconBtn.setBackgroundResource(R.drawable.ic_like_on_click);
+                    events.get(position).setFavoriteCount(events.get(position).getFavoriteCount()+1);
+                    holder.favoriteCountTxt.setText(events.get(position).getFavoriteCount()+" favorites");
+                    postFavoriteStatusToAPI(0, events.get(position).getEventId());
+                } else {
+                    events.get(position).setIsFavorite(0);
+                    holder.favoriteIconBtn.setBackgroundResource(R.drawable.ic_like);
+                    events.get(position).setFavoriteCount(events.get(position).getFavoriteCount()-1);
+                    holder.favoriteCountTxt.setText(events.get(position).getFavoriteCount()+" favorites");
+                    postFavoriteStatusToAPI(1, events.get(position).getEventId());
+                }
+            }
+        });
+
+        holder.favoriteCountTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickedItemPosition = position;
+                clickedHolder = holder;
+                if(events.get(position).getIsFavorite() == 0) {
+                    events.get(position).setIsFavorite(1);
+                    holder.favoriteIconBtn.setBackgroundResource(R.drawable.ic_like_on_click);
+                    events.get(position).setFavoriteCount(events.get(position).getFavoriteCount()+1);
+                    holder.favoriteCountTxt.setText(events.get(position).getFavoriteCount()+" favorites");
+                    postFavoriteStatusToAPI(0, events.get(position).getEventId());
+                } else {
+                    events.get(position).setIsFavorite(0);
+                    holder.favoriteIconBtn.setBackgroundResource(R.drawable.ic_like);
+                    events.get(position).setFavoriteCount(events.get(position).getFavoriteCount()-1);
+                    holder.favoriteCountTxt.setText(events.get(position).getFavoriteCount()+" favorites");
+                    postFavoriteStatusToAPI(1, events.get(position).getEventId());
+                }
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return events.size();
+    }
+
+    @Override
+    public void onSuccess() {
+
+    }
+
+    @Override
+    public void onFailed() {
+        if(events.get(clickedItemPosition).getIsFavorite() == 1) {
+            events.get(clickedItemPosition).setIsFavorite(0);
+            events.get(clickedItemPosition).setFavoriteCount(events.get(clickedItemPosition).getFavoriteCount() - 1);
+            clickedHolder.favoriteIconBtn.setBackgroundResource(R.drawable.ic_like);
+            clickedHolder.favoriteCountTxt.setText(events.get(clickedItemPosition).getFavoriteCount() + " favorites");
+        } else {
+            events.get(clickedItemPosition).setIsFavorite(1);
+            events.get(clickedItemPosition).setFavoriteCount(events.get(clickedItemPosition).getFavoriteCount() + 1);
+            clickedHolder.favoriteIconBtn.setBackgroundResource(R.drawable.ic_like_on_click);
+            clickedHolder.favoriteCountTxt.setText(events.get(clickedItemPosition).getFavoriteCount() + " favorites");
+        }
+    }
+
+    private void postFavoriteStatusToAPI(int favoriteStatus, int eventId) {
+        /* create JSONObject data */
+        JSONObject favoriteObj = new JSONObject();
+        try {
+            favoriteObj.put("accountID", 1);
+            favoriteObj.put("eventID", eventId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if(favoriteStatus == 0)
+            favoritePostReqUrl = "https://aegis.web.id/jaktopia/api/v1/favorite/add";
+        else
+            favoritePostReqUrl = "https://aegis.web.id/jaktopia/api/v1/favorite/remove";
+        requestQueue = Volley.newRequestQueue(mContext);
+        JsonObjectRequest objectRequest = new JsonObjectRequest(Request.Method.POST, favoritePostReqUrl, favoriteObj,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String successStatus = response.getString("success");
+                            String message = response.getString("message");
+                            if(successStatus.equals("true")) {
+                                onSuccess();
+                            } else {
+                                onFailed();
+                            }
+                            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(mContext, "Network error", Toast.LENGTH_SHORT).show();
+                        onFailed();
+                    }
+                }
+        );
+        requestQueue.add(objectRequest);
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 }

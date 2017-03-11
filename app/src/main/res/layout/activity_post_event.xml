@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_post_event"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.jaktopia.tiramisu.jaktopia.PostEventActivity">
+
+    <android.support.v7.widget.Toolbar android:id="@+id/post_event_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:background="#f8a161">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="POST AN EVENT"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:textColor="#ffffff"/>
+
+    </android.support.v7.widget.Toolbar>
+
+    <TextView android:id="@+id/post_event_choose_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_event_toolbar"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:text="Choose a \ncategory :"
+        android:textSize="14sp"
+        android:textColor="#212121"
+        android:fontFamily="sans-serif-light"/>
+
+    <TextView android:id="@+id/post_event_chosen_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_event_choose_title"
+        android:layout_marginStart="20dp"
+        android:text="Food"
+        android:textSize="14sp"
+        android:textColor="#212121"
+        android:fontFamily="sans-serif-medium"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_event_toolbar"
+        android:layout_toEndOf="@id/post_event_choose_title"
+        android:layout_alignTop="@id/post_event_choose_title"
+        android:layout_alignBottom="@id/post_event_chosen_category">
+
+        <Button android:id="@+id/post_event_food_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/ic_category_food"
+            android:layout_marginEnd="10dp"/>
+
+        <Button android:id="@+id/post_event_sport_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/ic_category_sport"
+            android:layout_toEndOf="@id/post_event_food_button"
+            android:layout_marginEnd="10dp"/>
+
+        <Button android:id="@+id/post_event_education_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/ic_category_education"
+            android:layout_toEndOf="@id/post_event_sport_button"
+            android:layout_marginEnd="10dp"/>
+
+        <Button android:id="@+id/post_event_traffic_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/ic_category_traffic"
+            android:layout_toEndOf="@id/post_event_education_button"
+            android:layout_marginEnd="10dp"/>
+
+        <Button android:id="@+id/post_event_accident_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/ic_category_accident"
+            android:layout_toEndOf="@id/post_event_traffic_button"
+            android:layout_marginEnd="10dp"/>
+
+        <Button android:id="@+id/post_event_entertainment_button"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/ic_category_entertainment"
+            android:layout_toEndOf="@id/post_event_accident_button"
+            android:layout_marginEnd="10dp"/>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.CardView android:id="@+id/post_event_name_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_event_chosen_category"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#00000000">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/timeline_comment_card_bg">
+
+            <EditText android:id="@+id/post_event_insert_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="event name..."
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-light"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView android:id="@+id/post_event_description_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_event_name_card"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#00000000">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/timeline_comment_card_bg">
+
+            <EditText android:id="@+id/post_event_insert_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="whats up..."
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-light"
+                android:lines="4"
+                android:gravity="top|left"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView android:id="@+id/post_event_location_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/post_event_description_card"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#00000000">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/timeline_comment_card_bg">
+
+            <EditText android:id="@+id/post_event_insert_location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="location..."
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-light"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <Button android:id="@+id/post_event_post_button"
+        android:layout_width="100dp"
+        android:layout_height="35dp"
+        android:background="@drawable/ic_post_event_button"
+        android:layout_below="@id/post_event_location_card"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"/>
+
+</RelativeLayout>

@@ -5,43 +5,33 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.widget.TextView;
 
-import com.android.volley.RequestQueue;
-import com.jaktopia.tiramisu.jaktopia.ObjectClass.Event;
-import com.jaktopia.tiramisu.jaktopia.ObjectClass.ProfileInfo;
 import com.jaktopia.tiramisu.jaktopia.PagerAdapter.HomePagerAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
     Toolbar toolbar;
+    TextView toolbarTitle;
     TabLayout tabLayout;
     ViewPager viewPager;
 
     HomePagerAdapter mPagerAdapter;
 
-    String eventTimelineReqUrl;
-    RequestQueue requestQueue;
-
-    List<Event> allEvents = new ArrayList<Event>();
-    List<Event> userEvents = new ArrayList<Event>();
-    ProfileInfo userInfo;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_layout);
+        setContentView(R.layout.activity_home);
 
         toolbar = (Toolbar)findViewById(R.id.home_toolbar);
+        toolbarTitle = (TextView)findViewById(R.id.home_title);
         tabLayout = (TabLayout)findViewById(R.id.home_tab_layout);
         viewPager = (ViewPager)findViewById(R.id.home_view_pager);
+        viewPager.setOffscreenPageLimit(0);
 
         /* ===================== */
         /* set viewPager element */
         /* ===================== */
-        mPagerAdapter = new HomePagerAdapter(getSupportFragmentManager(), allEvents, userInfo, 4);
+        mPagerAdapter = new HomePagerAdapter(getSupportFragmentManager(), 4);
         viewPager.setAdapter(mPagerAdapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -79,10 +69,22 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                if(tab.getPosition() == 0) tab.setIcon(R.drawable.ic_home_onclick);
-                else if(tab.getPosition() == 1) tab.setIcon(R.drawable.ic_map_onclick);
-                else if(tab.getPosition() == 2) tab.setIcon(R.drawable.ic_profile_onclick);
-                else if(tab.getPosition() == 3) tab.setIcon(R.drawable.ic_comingsoon_onclick);
+                if(tab.getPosition() == 0) {
+                    tab.setIcon(R.drawable.ic_home_onclick);
+                    toolbarTitle.setText("HOME");
+                }
+                else if(tab.getPosition() == 1) {
+                    tab.setIcon(R.drawable.ic_map_onclick);
+                    toolbarTitle.setText("MAP");
+                }
+                else if(tab.getPosition() == 2) {
+                    tab.setIcon(R.drawable.ic_profile_onclick);
+                    toolbarTitle.setText("PROFILE");
+                }
+                else if(tab.getPosition() == 3) {
+                    tab.setIcon(R.drawable.ic_comingsoon_onclick);
+                    toolbarTitle.setText("COMING SOON");
+                }
             }
 
             @Override
@@ -98,11 +100,5 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-    @Override /* inflate menu to toolbar */
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_home_menu, menu);
-        return super.onCreateOptionsMenu(menu);
     }
 }

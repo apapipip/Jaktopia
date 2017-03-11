@@ -10,6 +10,7 @@ public class Comment {
     int userId;
     String username;
     String content;
+    String userIconUrl;
     long postTime;
 
     public int getUserId() {
@@ -34,6 +35,14 @@ public class Comment {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getUserIconUrl() {
+        return userIconUrl;
+    }
+
+    public void setUserIconUrl(String userIconUrl) {
+        this.userIconUrl = userIconUrl;
     }
 
     public long getPostTime() {

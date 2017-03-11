@@ -1,19 +1,15 @@
 package com.jaktopia.tiramisu.jaktopia;
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.android.volley.Request;
@@ -36,18 +32,14 @@ import java.util.List;
 
 import static android.view.View.GONE;
 
-/**
- * Created by lsoehadak on 2/19/17.
- */
-
-public class UserProfileFragment extends Fragment {
-    Context mContext;
-
+public class PeekProfileActivity extends AppCompatActivity {
     SwipeRefreshLayout refreshLyt;
+    Toolbar toolbar;
     RecyclerView recyclerView;
     ProfileRecyclerAdapter profileRecyclerAdapter;
     ProgressBar progressBar;
 
+    int userId;
     ProfileInfo userInfo;
     List<Event> events = new ArrayList<Event>();
 
@@ -55,17 +47,42 @@ public class UserProfileFragment extends Fragment {
     RequestQueue requestQueue;
     IVolleyCallBack volleyCallBack;
 
-    public void onCreate(Bundle savedInstance) {
-        super.onCreate(savedInstance);
-        setHasOptionsMenu(true);
-        mContext = getActivity();
-        userInfo = new ProfileInfo();
-        profileRecyclerAdapter = new ProfileRecyclerAdapter(mContext, userInfo, new ArrayList<Event>(events));
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_peek_profile);
+
+        refreshLyt = (SwipeRefreshLayout)findViewById(R.id.peek_profile_refresh_layout);
+        toolbar = (Toolbar)findViewById(R.id.peek_profile_toolbar);
+        recyclerView = (RecyclerView)findViewById(R.id.peek_profile_recycler_view);
+        progressBar = (ProgressBar)findViewById(R.id.peek_profile_progress_bar);
+
+        /* set toolbar element */
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_back2);
+
+        /* get eventId from intent */
+        Intent intent = getIntent();
+        userId = intent.getIntExtra("user_id", 0);
+
+        /* set swipe refresh layout listener */
+        refreshLyt.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLyt.setRefreshing(true);
+                getProfileFromAPI(volleyCallBack);
+            }
+        });
+
 
         /* instantiate callback interface */
         volleyCallBack = new IVolleyCallBack() {
             @Override
             public void onSuccess() {
+                /* show recyclerView and hide progressBar */
                 progressBar.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
                 refreshLyt.setRefreshing(false);
@@ -80,6 +97,10 @@ public class UserProfileFragment extends Fragment {
                 refreshLyt.setRefreshing(false);
             }
         };
+
+        profileRecyclerAdapter = new ProfileRecyclerAdapter(this, userInfo, new ArrayList<Event>(events));
+        recyclerView.setAdapter(profileRecyclerAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -90,39 +111,11 @@ public class UserProfileFragment extends Fragment {
         super.onResume();
     }
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance) {
-        View view = inflater.inflate(R.layout.fragment_profile_layout, container, false);
-        refreshLyt = (SwipeRefreshLayout)view.findViewById(R.id.profile_refresh_layout);
-        recyclerView = (RecyclerView)view.findViewById(R.id.profile_recycler_view);
-        progressBar = (ProgressBar)view.findViewById(R.id.profile_progress_bar);
-
-        /* set swipe refresh layout listener */
-        refreshLyt.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshLyt.setRefreshing(true);
-                getProfileFromAPI(volleyCallBack);
-            }
-        });
-
-        recyclerView.setAdapter(profileRecyclerAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        return view;
-    }
-
-    @Override /* inflate menu to toolbar */
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        menu.clear();
-        inflater.inflate(R.menu.timeline_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if(id == R.id.timeline_setting_menu) {
-            Intent intent = new Intent(mContext, SettingActivity.class);
-            startActivity(intent);
+        if(item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -131,12 +124,12 @@ public class UserProfileFragment extends Fragment {
         /* clear events list */
         events.clear();
 
-        /* show progressBar and hide recyclerView */
+         /* show progressBar and hide recyclerView */
         progressBar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(GONE);
 
-        profileReqUrl = "https://aegis.web.id/jaktopia/api/v1/profile/1";
-        requestQueue = Volley.newRequestQueue(mContext);
+        profileReqUrl = "https://aegis.web.id/jaktopia/api/v1/profile/" + userId;
+        requestQueue = Volley.newRequestQueue(this);
         JsonObjectRequest objectRequest = new JsonObjectRequest(Request.Method.GET, profileReqUrl, null,
                 new Response.Listener<JSONObject>() {
                     @Override

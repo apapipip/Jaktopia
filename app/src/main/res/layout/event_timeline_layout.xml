@@ -1,34 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout android:id="@+id/event_timeline_relative_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <ImageView
+        android:layout_width="2dp"
+        android:layout_height="500dp"
+        android:src="#dedede"
+        android:layout_marginStart="87.5dp"
+        android:layout_alignBottom="@+id/event_timeline_comment_card"/>
+
     <de.hdodenhof.circleimageview.CircleImageView android:id="@+id/event_timeline_user_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:layout_marginStart="20dp"
-        android:layout_marginEnd="13dp"
-        android:layout_marginTop="15dp"
-        android:src="@drawable/profpic" />
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/ic_profpict_default" />
 
     <ImageView android:id="@+id/event_timeline_category_icon"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_alignTop="@+id/event_timeline_user_icon"
         android:layout_toEndOf="@+id/event_timeline_user_icon"
         android:layout_marginEnd="13dp"
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="5dp"
         android:background="@drawable/ic_category_accident"/>
 
     <TextView android:id="@+id/event_timeline_event_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Demonstration"
-        android:textStyle="bold"
         android:textSize="15sp"
-        android:layout_alignTop="@+id/event_timeline_category_icon"
+        android:textColor="#212121"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="bold"
+        android:layout_alignTop="@+id/event_timeline_user_icon"
         android:layout_toEndOf="@+id/event_timeline_category_icon" />
 
     <TextView android:id="@+id/event_timeline_category_name_and_location"
@@ -36,6 +46,8 @@
         android:layout_height="wrap_content"
         android:text="accident at Tebet"
         android:textSize="15sp"
+        android:textColor="#212121"
+        android:fontFamily="sans-serif-light"
         android:layout_below="@id/event_timeline_event_name"
         android:layout_toEndOf="@id/event_timeline_category_icon"/>
 
@@ -44,19 +56,23 @@
         android:layout_height="wrap_content"
         android:text="5 minutes ago"
         android:textSize="14sp"
+        android:textColor="#212121"
+        android:fontFamily="sans-serif-light"
         android:layout_below="@id/event_timeline_category_name_and_location"
         android:layout_toEndOf="@id/event_timeline_category_icon"/>
 
     <ImageView android:id="@+id/event_timeline_event_photo"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/event_timeline_time"
-        android:src="@color/colorPrimaryDark"
         android:layout_centerHorizontal="true"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
         android:layout_marginEnd="20dp"
-        android:layout_marginTop="0dp"/>
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp" />
 
-    <android.support.v7.widget.CardView  android:id="@+id/event_timeline_comment_card"
+    <android.support.v7.widget.CardView android:id="@+id/event_timeline_comment_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/event_timeline_event_photo"
@@ -64,8 +80,7 @@
         android:layout_alignStart="@id/event_timeline_user_icon"
         android:layout_marginEnd="20dp"
         app:cardElevation="0dp"
-        app:cardBackgroundColor="#00000000"
-        android:layout_marginBottom="10dp">
+        app:cardBackgroundColor="#00000000">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -80,15 +95,17 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_marginEnd="5dp"
+                android:layout_marginTop="2dp"
                 android:background="@drawable/ic_like"/>
 
             <TextView android:id="@+id/event_timeline_favorite_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="108 favorites"
-                android:textSize="14sp"
-                android:layout_toEndOf="@id/event_timeline_favorite_icon"
-                android:layout_marginBottom="7dp"/>
+                android:textSize="15sp"
+                android:textColor="#f87757"
+                android:fontFamily="sans-serif"
+                android:layout_toEndOf="@id/event_timeline_favorite_icon"/>
 
             <TextView android:id="@+id/event_timeline_poster_caption"
                 android:layout_width="wrap_content"
@@ -96,24 +113,34 @@
                 android:layout_below="@id/event_timeline_favorite_count"
                 android:text="Luthfi Soehadak wah di sini rame banget nih, mending hindari jalan ini"
                 android:textSize="15sp"
-                android:layout_marginBottom="5dp"/>
+                android:textColor="#212121"
+                android:layout_marginTop="3dp"/>
 
            <TextView android:id="@+id/event_timeline_comment"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
                android:layout_below="@id/event_timeline_poster_caption"
                android:text="Hadak benar gan, ati2 \nFirman sudah aman gan"
-               android:textSize="15sp"
-               android:layout_marginBottom="5dp"/>
+               android:textSize="15sp"/>
+
+            <ImageView android:id="@+id/event_timeline_more_icon"
+                android:layout_width="27dp"
+                android:layout_height="7dp"
+                android:layout_marginTop="7dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/ic_more_comment"
+                android:layout_below="@id/event_timeline_comment"/>
 
             <TextView android:id="@+id/event_timeline_more_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="5 more comments"
                 android:textSize="14sp"
-                android:layout_below="@id/event_timeline_comment"/>
+                android:textColor="#747474"
+                android:fontFamily="sans-serif-light"
+                android:layout_below="@id/event_timeline_comment"
+                android:layout_toEndOf="@id/event_timeline_more_icon"/>
 
         </RelativeLayout>
-
     </android.support.v7.widget.CardView>
 </RelativeLayout>

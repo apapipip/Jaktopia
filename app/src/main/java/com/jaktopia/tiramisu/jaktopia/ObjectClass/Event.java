@@ -1,13 +1,17 @@
 package com.jaktopia.tiramisu.jaktopia.ObjectClass;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by lsoehadak on 2/19/17.
  */
 
-public class Event {
+public class Event implements Parcelable {
     int userId;
     int eventId;
     String userIconUrl;
@@ -22,6 +26,31 @@ public class Event {
     HashMap<String, String> lastComment = new HashMap<String, String>();
     int moreCommentCount;
     long postTime;
+
+    public Event() {
+    }
+
+    public Event(Parcel source) {
+        userId = source.readInt();
+        eventId = source.readInt();
+        userIconUrl = source.readString();
+        eventName = source.readString();
+        categoryName = source.readString();
+        location = source.readString();
+        photoUrl = source.readString();
+        isFavorite = source.readInt();
+        favoriteCount = source.readInt();
+        firstName = source.readString();
+        caption = source.readString();
+        final int N = source.readInt();
+        for(int i=0;i<N;i++) {
+            String key = source.readString();
+            String value = source.readString();
+            lastComment.put(key, value);
+        }
+        moreCommentCount = source.readInt();
+        postTime = source.readLong();
+    }
 
     public int getUserId() {
         return userId;
@@ -134,6 +163,46 @@ public class Event {
     public void setPostTime(long postTime) {
         this.postTime = postTime;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(userId);
+        dest.writeInt(eventId);
+        dest.writeString(userIconUrl);
+        dest.writeString(eventName);
+        dest.writeString(categoryName);
+        dest.writeString(location);
+        dest.writeString(photoUrl);
+        dest.writeInt(isFavorite);
+        dest.writeInt(favoriteCount);
+        dest.writeString(firstName);
+        dest.writeString(caption);
+        final int N = lastComment.size();
+        if(N>0)
+            for (Map.Entry<String, String> entry : lastComment.entrySet()) {
+                dest.writeString(entry.getKey());
+                dest.writeString(entry.getValue());
+            }
+        dest.writeInt(moreCommentCount);
+        dest.writeLong(postTime);
+    }
+
+    public static final Creator<Event> CREATOR = new Creator<Event>() {
+        @Override
+        public Event createFromParcel(Parcel source) {
+            return new Event(source);
+        }
+
+        @Override
+        public Event[] newArray(int size) {
+            return new Event[size];
+        }
+    };
 }
 
 
