@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 public class Comment {
     int userId;
+    int eventId;
     String username;
     String content;
     String userIconUrl;
@@ -19,6 +20,14 @@ public class Comment {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public int getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
     }
 
     public String getUsername() {

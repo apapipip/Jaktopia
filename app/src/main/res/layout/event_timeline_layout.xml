@@ -120,8 +120,15 @@
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
                android:layout_below="@id/event_timeline_poster_caption"
-               android:text="Hadak benar gan, ati2 \nFirman sudah aman gan"
+               android:text="Hadak benar gan, ati2"
                android:textSize="15sp"/>
+
+            <TextView android:id="@+id/event_timeline_comment_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/event_timeline_comment"
+                android:text="Hadak benar gan, ati2"
+                android:textSize="15sp"/>
 
             <ImageView android:id="@+id/event_timeline_more_icon"
                 android:layout_width="27dp"
@@ -129,7 +136,7 @@
                 android:layout_marginTop="7dp"
                 android:layout_marginEnd="5dp"
                 android:background="@drawable/ic_more_comment"
-                android:layout_below="@id/event_timeline_comment"/>
+                android:layout_below="@id/event_timeline_comment_2"/>
 
             <TextView android:id="@+id/event_timeline_more_comment"
                 android:layout_width="wrap_content"
@@ -138,7 +145,7 @@
                 android:textSize="14sp"
                 android:textColor="#747474"
                 android:fontFamily="sans-serif-light"
-                android:layout_below="@id/event_timeline_comment"
+                android:layout_below="@id/event_timeline_comment_2"
                 android:layout_toEndOf="@id/event_timeline_more_icon"/>
 
         </RelativeLayout>

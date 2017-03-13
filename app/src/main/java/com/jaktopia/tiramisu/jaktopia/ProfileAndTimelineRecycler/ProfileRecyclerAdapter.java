@@ -22,6 +22,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.jaktopia.tiramisu.jaktopia.CommentActivity;
 import com.jaktopia.tiramisu.jaktopia.Interface.IVolleyCallBack;
+import com.jaktopia.tiramisu.jaktopia.ObjectClass.Comment;
 import com.jaktopia.tiramisu.jaktopia.ObjectClass.Event;
 import com.jaktopia.tiramisu.jaktopia.ObjectClass.ProfileInfo;
 import com.jaktopia.tiramisu.jaktopia.R;
@@ -48,6 +49,7 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     LayoutInflater inflater;
     ProfileInfo userInfo;
     List<Event> events = new ArrayList<Event>();
+    List<Comment> lastComments = new ArrayList<Comment>();
 
     String favoritePostReqUrl;
     RequestQueue requestQueue;
@@ -55,10 +57,11 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     int clickedItemPosition;
     VHEventItem clickedHolder;
 
-    public ProfileRecyclerAdapter(Context mContext, ProfileInfo userInfo, List<Event> events) {
+    public ProfileRecyclerAdapter(Context mContext, ProfileInfo userInfo, List<Event> events, List<Comment> lastComments) {
         this.mContext = mContext;
         this.userInfo = userInfo;
         this.events = events;
+        this.lastComments = lastComments;
         inflater = LayoutInflater.from(mContext);
     }
 
@@ -89,21 +92,22 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             final VHEventItem vhEventItem = (VHEventItem)holder;
             /* set user icon */
             if(events.get(newPosition).getUserIconUrl() != "null")
-                Picasso.with(mContext).load(events.get(newPosition).getUserIconUrl()).placeholder(R.drawable.loading_image_animation).
+                Picasso.with(mContext).load(events.get(newPosition).getUserIconUrl()).placeholder(R.drawable.image_placeholder).
+                        error(R.drawable.image_placeholder).
                         into(vhEventItem.userIconImg);
 
             /* set category icon */
-            if(events.get(newPosition).getCategoryName() == "Accident")
+            if(events.get(newPosition).getCategoryName().equals("Accident"))
                 vhEventItem.categoryIconImg.setImageResource(R.drawable.ic_category_accident);
-            else if(events.get(newPosition).getCategoryName() == "Food")
+            else if(events.get(newPosition).getCategoryName().equals("Food"))
                 vhEventItem.categoryIconImg.setImageResource(R.drawable.ic_category_food);
-            else if(events.get(newPosition).getCategoryName() == "Education")
+            else if(events.get(newPosition).getCategoryName().equals("Education"))
                 vhEventItem.categoryIconImg.setImageResource(R.drawable.ic_category_education);
-            else if(events.get(newPosition).getCategoryName() == "Sport")
+            else if(events.get(newPosition).getCategoryName().equals("Sport"))
                 vhEventItem.categoryIconImg.setImageResource(R.drawable.ic_category_sport);
-            else if(events.get(newPosition).getCategoryName() == "Traffic")
+            else if(events.get(newPosition).getCategoryName().equals("Traffic"))
                 vhEventItem.categoryIconImg.setImageResource(R.drawable.ic_category_traffic);
-            else if(events.get(newPosition).getCategoryName() == "Entertainment")
+            else if(events.get(newPosition).getCategoryName().equals("Entertainment"))
                 vhEventItem.categoryIconImg.setImageResource(R.drawable.ic_category_entertainment);
 
             /* set event name */
@@ -133,16 +137,21 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             vhEventItem.postTimeTxt.setText("5 minutes ago");
 
             /* set event photo */
-            if(events.get(newPosition).getPhotoUrl() != "null") {
-                Picasso.with(mContext).load(events.get(newPosition).getPhotoUrl()).placeholder(R.drawable.loading_image_animation).
+            if(!events.get(newPosition).getPhotoUrl().equals("null")) {
+                Picasso.with(mContext).load(events.get(newPosition).getPhotoUrl()).placeholder(R.drawable.image_placeholder).
+                        error(R.drawable.image_placeholder).
                         into(vhEventItem.eventPhotoImg);
+                vhEventItem.eventPhotoImg.setVisibility(View.VISIBLE);
             } else {
+                /*
                 vhEventItem.eventPhotoImg.getLayoutParams().width = 0;
                 vhEventItem.eventPhotoImg.getLayoutParams().height = 0;
                 RelativeLayout.MarginLayoutParams layoutParams = (RelativeLayout.MarginLayoutParams)vhEventItem.eventPhotoImg.getLayoutParams();
                 layoutParams.setMargins(0,0,0,0);
                 vhEventItem.eventPhotoImg.setLayoutParams(layoutParams);
                 vhEventItem.eventPhotoImg.setImageResource(android.R.color.transparent);
+                */
+                vhEventItem.eventPhotoImg.setVisibility(View.GONE);
             }
 
             /* set favorite button icon */
@@ -178,12 +187,75 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                                 + "</font>"));
             }
             /* set comment if there any */
-            if(events.get(newPosition).getLastComment().size() > 0) {
-                for (Map.Entry<String, String> entry : events.get(newPosition).getLastComment().entrySet()) {
-                    vhEventItem.commentTxt.setText(entry.getKey() + " " + entry.getValue());
+            int commentCount = 0;
+            for(int i=0;i<lastComments.size();i++) {
+                //Log.e("cek id", lastComments.get(i).getEventId() + " - " + events.get(position).getEventId() + " at " + position);
+                if(commentCount == 0) {
+                    if(lastComments.get(i).getEventId() == events.get(newPosition).getEventId()) {
+                        if (Build.VERSION.SDK_INT >= 24) {
+                            vhEventItem.commentTxt.setText(Html.fromHtml(
+                                    "<font face=\"sans-serif-medium\">"
+                                            + "<b>"
+                                            + lastComments.get(i).getUsername()
+                                            + " "
+                                            + "</font>"
+                                            + "</b>"
+                                            + "<font face=\"sans-serif-light\">"
+                                            + lastComments.get(i).getContent()
+                                            + "</font>", Html.FROM_HTML_MODE_LEGACY));
+                        } else {
+                            vhEventItem.commentTxt.setText(Html.fromHtml(
+                                    "<font face=\"sans-serif-medium\">"
+                                            + "<b>"
+                                            + lastComments.get(i).getUsername()
+                                            + " "
+                                            + "</font>"
+                                            + "</b>"
+                                            + "<font face=\"sans-serif-light\">"
+                                            + lastComments.get(i).getContent()
+                                            + "</font>"));
+                        }
+                        commentCount++;
+                    }
+                } else {
+                    if(lastComments.get(i).getEventId() == events.get(newPosition).getEventId()) {
+                        if (Build.VERSION.SDK_INT >= 24) {
+                            vhEventItem.comment2Txt.setText(Html.fromHtml(
+                                    "<font face=\"sans-serif-medium\">"
+                                            + "<b>"
+                                            + lastComments.get(i).getUsername()
+                                            + " "
+                                            + "</font>"
+                                            + "</b>"
+                                            + "<font face=\"sans-serif-light\">"
+                                            + lastComments.get(i).getContent()
+                                            + "</font>", Html.FROM_HTML_MODE_LEGACY));
+                        } else {
+                            vhEventItem.comment2Txt.setText(Html.fromHtml(
+                                    "<font face=\"sans-serif-medium\">"
+                                            + "<b>"
+                                            + lastComments.get(i).getUsername()
+                                            + " "
+                                            + "</font>"
+                                            + "</b>"
+                                            + "<font face=\"sans-serif-light\">"
+                                            + lastComments.get(i).getContent()
+                                            + "</font>"));
+                        }
+                        commentCount++;
+                    }
                 }
-            } else
+            }
+            if(commentCount == 2) {
+                vhEventItem.commentTxt.setVisibility(View.VISIBLE);
+                vhEventItem.comment2Txt.setVisibility(View.VISIBLE);
+            } else if(commentCount == 1){
+                vhEventItem.commentTxt.setVisibility(View.VISIBLE);
+                vhEventItem.comment2Txt.setVisibility(GONE);
+            } else {
                 vhEventItem.commentTxt.setVisibility(GONE);
+                vhEventItem.comment2Txt.setVisibility(GONE);
+            }
 
             /* set more comment icon */
             if(events.get(newPosition).getMoreCommentCount() > 0)
@@ -294,14 +366,6 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     }
 
-    public void setUserInfo(ProfileInfo userInfo) {
-        this.userInfo = userInfo;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events;
-    }
-
     private void postFavoriteStatusToAPI(int favoriteStatus, int eventId) {
         /* create JSONObject data */
         JSONObject favoriteObj = new JSONObject();
@@ -344,5 +408,17 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 }
         );
         requestQueue.add(objectRequest);
+    }
+
+    public void setUserInfo(ProfileInfo userInfo) {
+        this.userInfo = userInfo;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
+
+    public void setLastComments(List<Comment> lastComments) {
+        this.lastComments = lastComments;
     }
 }

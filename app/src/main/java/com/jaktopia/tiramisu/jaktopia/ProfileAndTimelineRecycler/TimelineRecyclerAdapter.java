@@ -2,12 +2,10 @@ package com.jaktopia.tiramisu.jaktopia.ProfileAndTimelineRecycler;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,11 +20,10 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.jaktopia.tiramisu.jaktopia.CommentActivity;
 import com.jaktopia.tiramisu.jaktopia.Interface.IVolleyCallBack;
+import com.jaktopia.tiramisu.jaktopia.ObjectClass.Comment;
 import com.jaktopia.tiramisu.jaktopia.ObjectClass.Event;
 import com.jaktopia.tiramisu.jaktopia.PeekProfileActivity;
 import com.jaktopia.tiramisu.jaktopia.R;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -34,7 +31,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static android.view.View.GONE;
 
@@ -46,6 +42,7 @@ public class TimelineRecyclerAdapter extends RecyclerView.Adapter<VHEventItem> i
     Context mContext;
     LayoutInflater inflater;
     List<Event> events = new ArrayList<Event>();
+    List<Comment> lastComments = new ArrayList<Comment>();
 
     String favoritePostReqUrl;
     RequestQueue requestQueue;
@@ -53,9 +50,10 @@ public class TimelineRecyclerAdapter extends RecyclerView.Adapter<VHEventItem> i
     int clickedItemPosition;
     VHEventItem clickedHolder;
 
-    public TimelineRecyclerAdapter(Context mContext, List<Event> events) {
+    public TimelineRecyclerAdapter(Context mContext, List<Event> events, List<Comment> lastComments) {
         this.mContext = mContext;
         this.events = events;
+        this.lastComments = lastComments;
         inflater = LayoutInflater.from(mContext);
     }
 
@@ -69,7 +67,8 @@ public class TimelineRecyclerAdapter extends RecyclerView.Adapter<VHEventItem> i
     public void onBindViewHolder(final VHEventItem holder, final int position) {
         /* set user icon */
         if(!events.get(position).getUserIconUrl().equals("null"))
-            Picasso.with(mContext).load(events.get(position).getUserIconUrl()).placeholder(R.drawable.loading_image_animation).
+            Picasso.with(mContext).load(events.get(position).getUserIconUrl()).placeholder(R.drawable.image_placeholder).
+                    error(R.drawable.image_placeholder).
                     into(holder.userIconImg);
 
         /* set category icon */
@@ -114,15 +113,20 @@ public class TimelineRecyclerAdapter extends RecyclerView.Adapter<VHEventItem> i
 
         /* set event photo */
         if(!events.get(position).getPhotoUrl().equals("null")) {
-            Picasso.with(mContext).load(events.get(position).getPhotoUrl()).placeholder(R.drawable.loading_place_holder).
+            Picasso.with(mContext).load(events.get(position).getPhotoUrl()).placeholder(R.drawable.image_placeholder).
+                    error(R.drawable.image_placeholder).
                     into(holder.eventPhotoImg);
+            holder.eventPhotoImg.setVisibility(View.VISIBLE);
         } else {
+            /*
             holder.eventPhotoImg.getLayoutParams().width = 0;
             holder.eventPhotoImg.getLayoutParams().height = 0;
             RelativeLayout.MarginLayoutParams layoutParams = (RelativeLayout.MarginLayoutParams)holder.eventPhotoImg.getLayoutParams();
             layoutParams.setMargins(0,0,0,0);
             holder.eventPhotoImg.setLayoutParams(layoutParams);
             holder.eventPhotoImg.setImageResource(android.R.color.transparent);
+            */
+            holder.eventPhotoImg.setVisibility(GONE);
         }
 
         /* set favorite button icon */
@@ -159,12 +163,75 @@ public class TimelineRecyclerAdapter extends RecyclerView.Adapter<VHEventItem> i
         }
 
         /* set comment if there any */
-        if(events.get(position).getLastComment().size() > 0) {
-            for (Map.Entry<String, String> entry : events.get(position).getLastComment().entrySet()) {
-                holder.commentTxt.setText(entry.getKey() + " " + entry.getValue());
+        int commentCount = 0;
+        for(int i=0;i<lastComments.size();i++) {
+            //Log.e("cek id", lastComments.get(i).getEventId() + " - " + events.get(position).getEventId() + " at " + position);
+            if(commentCount == 0) {
+                if(lastComments.get(i).getEventId() == events.get(position).getEventId()) {
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        holder.commentTxt.setText(Html.fromHtml(
+                                "<font face=\"sans-serif-medium\">"
+                                        + "<b>"
+                                        + lastComments.get(i).getUsername()
+                                        + " "
+                                        + "</font>"
+                                        + "</b>"
+                                        + "<font face=\"sans-serif-light\">"
+                                        + lastComments.get(i).getContent()
+                                        + "</font>", Html.FROM_HTML_MODE_LEGACY));
+                    } else {
+                        holder.commentTxt.setText(Html.fromHtml(
+                                "<font face=\"sans-serif-medium\">"
+                                        + "<b>"
+                                        + lastComments.get(i).getUsername()
+                                        + " "
+                                        + "</font>"
+                                        + "</b>"
+                                        + "<font face=\"sans-serif-light\">"
+                                        + lastComments.get(i).getContent()
+                                        + "</font>"));
+                    }
+                    commentCount++;
+                }
+            } else {
+                if(lastComments.get(i).getEventId() == events.get(position).getEventId()) {
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        holder.comment2Txt.setText(Html.fromHtml(
+                                "<font face=\"sans-serif-medium\">"
+                                        + "<b>"
+                                        + lastComments.get(i).getUsername()
+                                        + " "
+                                        + "</font>"
+                                        + "</b>"
+                                        + "<font face=\"sans-serif-light\">"
+                                        + lastComments.get(i).getContent()
+                                        + "</font>", Html.FROM_HTML_MODE_LEGACY));
+                    } else {
+                        holder.comment2Txt.setText(Html.fromHtml(
+                                "<font face=\"sans-serif-medium\">"
+                                        + "<b>"
+                                        + lastComments.get(i).getUsername()
+                                        + " "
+                                        + "</font>"
+                                        + "</b>"
+                                        + "<font face=\"sans-serif-light\">"
+                                        + lastComments.get(i).getContent()
+                                        + "</font>"));
+                    }
+                    commentCount++;
+                }
             }
-        } else
+        }
+        if(commentCount == 2) {
+            holder.commentTxt.setVisibility(View.VISIBLE);
+            holder.comment2Txt.setVisibility(View.VISIBLE);
+        } else if(commentCount == 1){
+            holder.commentTxt.setVisibility(View.VISIBLE);
+            holder.comment2Txt.setVisibility(GONE);
+        } else {
             holder.commentTxt.setVisibility(GONE);
+            holder.comment2Txt.setVisibility(GONE);
+        }
 
         /* set more comment icon */
         if(events.get(position).getMoreCommentCount() > 0)
@@ -316,5 +383,9 @@ public class TimelineRecyclerAdapter extends RecyclerView.Adapter<VHEventItem> i
 
     public void setEvents(List<Event> events) {
         this.events = events;
+    }
+
+    public void setLastComments(List<Comment> lastComments) {
+        this.lastComments = lastComments;
     }
 }

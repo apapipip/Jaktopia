@@ -51,7 +51,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/post_event_toolbar"
         android:layout_toEndOf="@id/post_event_choose_title"
-        android:layout_alignTop="@id/post_event_choose_title"
+
         android:layout_alignBottom="@id/post_event_chosen_category">
 
         <Button android:id="@+id/post_event_food_button"

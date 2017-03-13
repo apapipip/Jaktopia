@@ -2,6 +2,7 @@ package com.jaktopia.tiramisu.jaktopia;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,6 +24,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.jaktopia.tiramisu.jaktopia.Interface.IVolleyCallBack;
+import com.jaktopia.tiramisu.jaktopia.ObjectClass.Comment;
 import com.jaktopia.tiramisu.jaktopia.ObjectClass.Event;
 import com.jaktopia.tiramisu.jaktopia.ObjectClass.ProfileInfo;
 import com.jaktopia.tiramisu.jaktopia.ProfileAndTimelineRecycler.ProfileRecyclerAdapter;
@@ -34,6 +36,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
 import static android.view.View.GONE;
 
 /**
@@ -48,10 +51,13 @@ public class UserProfileFragment extends Fragment {
     ProfileRecyclerAdapter profileRecyclerAdapter;
     ProgressBar progressBar;
 
+    String userId;
     ProfileInfo userInfo;
     List<Event> events = new ArrayList<Event>();
+    List<Comment> lastComments = new ArrayList<Comment>();
 
     String profileReqUrl;
+    String lastCommentReqUrl;
     RequestQueue requestQueue;
     IVolleyCallBack volleyCallBack;
 
@@ -60,7 +66,11 @@ public class UserProfileFragment extends Fragment {
         setHasOptionsMenu(true);
         mContext = getActivity();
         userInfo = new ProfileInfo();
-        profileRecyclerAdapter = new ProfileRecyclerAdapter(mContext, userInfo, new ArrayList<Event>(events));
+        profileRecyclerAdapter = new ProfileRecyclerAdapter(mContext, userInfo, new ArrayList<Event>(events), new ArrayList<Comment>(lastComments));
+
+        /* get user id value from sharedpref */
+        SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences("UserProfileData", MODE_PRIVATE);
+        userId = sharedPreferences.getString("userId", "-1");
 
         /* instantiate callback interface */
         volleyCallBack = new IVolleyCallBack() {
@@ -72,6 +82,7 @@ public class UserProfileFragment extends Fragment {
 
                 profileRecyclerAdapter.setUserInfo(userInfo);
                 profileRecyclerAdapter.setEvents(new ArrayList<Event>(events));
+                profileRecyclerAdapter.setLastComments(new ArrayList<Comment>(lastComments));
                 profileRecyclerAdapter.notifyDataSetChanged();
             }
 
@@ -86,6 +97,7 @@ public class UserProfileFragment extends Fragment {
     public void onResume() {
          /* get data from API */
         getProfileFromAPI(volleyCallBack);
+        getLastCommentFromAPI(volleyCallBack);
 
         super.onResume();
     }
@@ -102,6 +114,7 @@ public class UserProfileFragment extends Fragment {
             public void onRefresh() {
                 refreshLyt.setRefreshing(true);
                 getProfileFromAPI(volleyCallBack);
+                getLastCommentFromAPI(volleyCallBack);
             }
         });
 
@@ -113,7 +126,7 @@ public class UserProfileFragment extends Fragment {
     @Override /* inflate menu to toolbar */
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
-        inflater.inflate(R.menu.timeline_menu, menu);
+        inflater.inflate(R.menu.fragment_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -135,7 +148,7 @@ public class UserProfileFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(GONE);
 
-        profileReqUrl = "https://aegis.web.id/jaktopia/api/v1/profile/1";
+        profileReqUrl = "https://aegis.web.id/jaktopia/api/v1/profile/" + userId;
         requestQueue = Volley.newRequestQueue(mContext);
         JsonObjectRequest objectRequest = new JsonObjectRequest(Request.Method.GET, profileReqUrl, null,
                 new Response.Listener<JSONObject>() {
@@ -190,6 +203,46 @@ public class UserProfileFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e("Volley", "Error");
+                    }
+                }
+        );
+        requestQueue.add(objectRequest);
+    }
+
+    private void getLastCommentFromAPI(final IVolleyCallBack volleyCallBack) {
+        /* clear last comment */
+        lastComments.clear();
+
+        lastCommentReqUrl = "https://aegis.web.id/jaktopia/api/v1/two_comment";
+        requestQueue = Volley.newRequestQueue(mContext);
+        JsonObjectRequest objectRequest = new JsonObjectRequest(Request.Method.GET, lastCommentReqUrl, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray dataArr = response.getJSONArray("data");
+                            for(int i=0;i<dataArr.length();i++) {
+                                Comment comment = new Comment();
+                                JSONObject dataObj = dataArr.getJSONObject(i);
+                                comment.setEventId(dataObj.getInt("event_id"));
+                                comment.setContent(dataObj.getString("comment_content"));
+                                comment.setUsername(dataObj.getString("account_name"));
+                                comment.setUserId(dataObj.getInt("account_id"));
+
+                                //Log.e("eventID", ""+comment.getEventId());
+
+                                lastComments.add(comment);
+                            }
+                            volleyCallBack.onSuccess();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
                     }
                 }
         );

@@ -25,6 +25,7 @@ public class VHEventItem extends RecyclerView.ViewHolder {
     TextView favoriteCountTxt;
     TextView posterCaptionTxt;
     TextView commentTxt;
+    TextView comment2Txt;
     ImageView moreIconImg;
     TextView moreCommentTxt;
     CardView commentCardView;
@@ -42,6 +43,7 @@ public class VHEventItem extends RecyclerView.ViewHolder {
         favoriteCountTxt = (TextView)itemView.findViewById(R.id.event_timeline_favorite_count);
         posterCaptionTxt = (TextView)itemView.findViewById(R.id.event_timeline_poster_caption);
         commentTxt = (TextView)itemView.findViewById(R.id.event_timeline_comment);
+        comment2Txt = (TextView)itemView.findViewById(R.id.event_timeline_comment_2);
         moreIconImg = (ImageView)itemView.findViewById(R.id.event_timeline_more_icon);
         moreCommentTxt = (TextView)itemView.findViewById(R.id.event_timeline_more_comment);
         commentCardView = (CardView)itemView.findViewById(R.id.event_timeline_comment_card);

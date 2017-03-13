@@ -1,5 +1,6 @@
 package com.jaktopia.tiramisu.jaktopia;
 
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -36,6 +37,7 @@ public class PostEventActivity extends AppCompatActivity {
     EditText eventLocationEdt;
     Button postBtn;
 
+    String userId;
     int chosenCategoryId;
     String chosenCategoryName;
     double userLatitude;
@@ -64,6 +66,10 @@ public class PostEventActivity extends AppCompatActivity {
         eventDescEdt = (EditText)findViewById(R.id.post_event_insert_description);
         eventLocationEdt = (EditText)findViewById(R.id.post_event_insert_location);
         postBtn = (Button)findViewById(R.id.post_event_post_button);
+
+        /* get user id value from sharedpref */
+        SharedPreferences sharedPreferences = getSharedPreferences("UserProfileData", MODE_PRIVATE);
+        userId = sharedPreferences.getString("userId", "-1");
 
         /* set toolbar element */
         toolbar.setTitle("");
@@ -193,7 +199,7 @@ public class PostEventActivity extends AppCompatActivity {
             Log.e("locationName", eventLocationEdt.getText()+"");
             Log.e("locationLatitude", userLatitude+"");
             Log.e("locationLongitude", userLongitude+"");
-            Log.e("accountID", 1+"");
+            Log.e("accountID", userId);
         } catch (JSONException e) {
             e.printStackTrace();
         }

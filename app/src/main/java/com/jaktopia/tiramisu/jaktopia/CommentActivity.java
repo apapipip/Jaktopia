@@ -1,6 +1,7 @@
 package com.jaktopia.tiramisu.jaktopia;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,6 +35,7 @@ import java.util.List;
 import static android.view.View.GONE;
 
 public class CommentActivity extends AppCompatActivity {
+    String userId;
     List<Comment> comments = new ArrayList<Comment>();
 
     Toolbar toolbar;
@@ -60,6 +62,10 @@ public class CommentActivity extends AppCompatActivity {
         postCommentBtn = (Button)findViewById(R.id.comment_post_button);
         progressBar = (ProgressBar)findViewById(R.id.comment_progress_bar);
         recyclerView = (RecyclerView)findViewById(R.id.comment_recycler_view);
+
+        /* get user id value from sharedpref */
+        SharedPreferences sharedPreferences = getSharedPreferences("UserProfileData", MODE_PRIVATE);
+        userId = sharedPreferences.getString("userId", "-1");
 
         /* set on postCommentBtn onClickListener */
         postCommentBtn.setOnClickListener(new View.OnClickListener() {
@@ -88,7 +94,7 @@ public class CommentActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
                 insertCommentEdt.getText().clear();
-                recyclerView.scrollToPosition(comments.size()-1);
+                //recyclerView.scrollToPosition(comments.size()-1);
 
                 commentRecyclerAdapter.setComments(new ArrayList<Comment>(comments));
                 commentRecyclerAdapter.notifyDataSetChanged();
@@ -182,7 +188,7 @@ public class CommentActivity extends AppCompatActivity {
         /* create JSONObject data */
         JSONObject commentObj = new JSONObject();
         try {
-            commentObj.put("accountID", "1");
+            commentObj.put("accountID", userId);
             commentObj.put("eventID", eventId);
             commentObj.put("content", insertCommentEdt.getText());
         } catch (JSONException e) {

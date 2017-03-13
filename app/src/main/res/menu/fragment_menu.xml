@@ -6,11 +6,6 @@
         android:icon="@drawable/ic_search"
         app:showAsAction="always" />
 
-    <item android:id="@+id/timeline_favorite_menu"
-        android:title="Favorite event"
-        android:icon="@drawable/ic_favorites"
-        app:showAsAction="always" />
-
     <item android:id="@+id/timeline_setting_menu"
         android:title="Setting"
         android:icon="@drawable/ic_setting"
