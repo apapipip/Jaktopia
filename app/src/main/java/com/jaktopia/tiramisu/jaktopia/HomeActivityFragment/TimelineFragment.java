@@ -1,4 +1,4 @@
-package com.jaktopia.tiramisu.jaktopia;
+package com.jaktopia.tiramisu.jaktopia.HomeActivityFragment;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +27,10 @@ import com.android.volley.toolbox.Volley;
 import com.jaktopia.tiramisu.jaktopia.Interface.IVolleyCallBack;
 import com.jaktopia.tiramisu.jaktopia.ObjectClass.Comment;
 import com.jaktopia.tiramisu.jaktopia.ObjectClass.Event;
+import com.jaktopia.tiramisu.jaktopia.PostEventActivity;
 import com.jaktopia.tiramisu.jaktopia.ProfileAndTimelineRecycler.TimelineRecyclerAdapter;
+import com.jaktopia.tiramisu.jaktopia.R;
+import com.jaktopia.tiramisu.jaktopia.SettingActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,7 +83,7 @@ public class TimelineFragment extends Fragment {
             @Override
             public void onSuccess() {
                 successRequest++;
-                if(successRequest == 2) {
+                if (successRequest == 2) {
                     successRequest = 0;
                     progressBar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
@@ -106,11 +109,10 @@ public class TimelineFragment extends Fragment {
     @Override
     public void onResume() {
         /* get data from API */
-        if(!isFavorite) {
+        if (!isFavorite) {
             getEventFromAPI(volleyCallBack);
             getLastCommentFromAPI(volleyCallBack);
-        }
-        else {
+        } else {
             getFavoriteEventFromAPI(volleyCallBack);
             getLastCommentFromAPI(volleyCallBack);
         }
@@ -120,10 +122,10 @@ public class TimelineFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstance) {
         View view = inflater.inflate(R.layout.fragment_timeline_layout, container, false);
-        refreshLyt = (SwipeRefreshLayout)view.findViewById(R.id.timeline_refresh_layout);
-        postBtn = (Button)view.findViewById(R.id.timeline_post_button);
-        recyclerView = (RecyclerView)view.findViewById(R.id.timeline_recycler_view);
-        progressBar = (ProgressBar)view.findViewById(R.id.timeline_progress_bar);
+        refreshLyt = (SwipeRefreshLayout) view.findViewById(R.id.timeline_refresh_layout);
+        postBtn = (Button) view.findViewById(R.id.timeline_post_button);
+        recyclerView = (RecyclerView) view.findViewById(R.id.timeline_recycler_view);
+        progressBar = (ProgressBar) view.findViewById(R.id.timeline_progress_bar);
 
         /* set post button listener */
         postBtn.setOnClickListener(new View.OnClickListener() {
@@ -139,11 +141,10 @@ public class TimelineFragment extends Fragment {
             @Override
             public void onRefresh() {
                 refreshLyt.setRefreshing(true);
-                if(!isFavorite) {
+                if (!isFavorite) {
                     getEventFromAPI(volleyCallBack);
                     getLastCommentFromAPI(volleyCallBack);
-                }
-                else {
+                } else {
                     getFavoriteEventFromAPI(volleyCallBack);
                     getLastCommentFromAPI(volleyCallBack);
                 }
@@ -160,10 +161,9 @@ public class TimelineFragment extends Fragment {
         menu.clear();
         inflater.inflate(R.menu.timeline_menu, menu);
         this.menu = menu;
-        if(isFavorite) {
+        if (isFavorite) {
             menu.getItem(1).setIcon(R.drawable.ic_favorites_onclick);
-        }
-        else
+        } else
             menu.getItem(1).setIcon(R.drawable.ic_favorites);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -171,17 +171,16 @@ public class TimelineFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.timeline_setting_menu) {
+        if (id == R.id.timeline_setting_menu) {
             Intent intent = new Intent(mContext, SettingActivity.class);
             startActivity(intent);
-        } else if(id == R.id.timeline_favorite_menu) {
-            if(isFavorite) {
+        } else if (id == R.id.timeline_favorite_menu) {
+            if (isFavorite) {
                 menu.getItem(1).setIcon(R.drawable.ic_favorites);
                 isFavorite = false;
                 getEventFromAPI(volleyCallBack);
                 getLastCommentFromAPI(volleyCallBack);
-            }
-            else {
+            } else {
                 menu.getItem(1).setIcon(R.drawable.ic_favorites_onclick);
                 isFavorite = true;
                 getFavoriteEventFromAPI(volleyCallBack);
@@ -207,7 +206,7 @@ public class TimelineFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray dataArr = response.getJSONArray("data");
-                            for(int i=0;i<dataArr.length();i++) {
+                            for (int i = 0; i < dataArr.length(); i++) {
                                 Event event = new Event();
                                 JSONObject dataObj = dataArr.getJSONObject(i);
                                 event.setUserId(dataObj.getInt("account_id"));
@@ -217,13 +216,13 @@ public class TimelineFragment extends Fragment {
                                 event.setCategoryName(dataObj.getString("category_name"));
                                 event.setLocation(dataObj.getString("location_name"));
                                 event.setPhotoUrl(dataObj.getString("event_photo"));
-                                if(dataObj.getBoolean("is_favorited"))
+                                if (dataObj.getBoolean("is_favorited"))
                                     event.setIsFavorite(1);
                                 else
                                     event.setIsFavorite(0);
                                 event.setFavoriteCount(dataObj.getInt("sum_favorite"));
                                 event.setFirstName(dataObj.getString("account_username"));
-                                if(dataObj.has("event_caption") && !dataObj.isNull("event_caption"))
+                                if (dataObj.has("event_caption") && !dataObj.isNull("event_caption"))
                                     event.setCaption(dataObj.getString("event_caption"));
                                 else
                                     event.setCaption("");
@@ -265,7 +264,7 @@ public class TimelineFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray dataArr = response.getJSONArray("data");
-                            for(int i=0;i<dataArr.length();i++) {
+                            for (int i = 0; i < dataArr.length(); i++) {
                                 Event event = new Event();
                                 JSONObject dataObj = dataArr.getJSONObject(i);
                                 event.setUserId(dataObj.getInt("account_id"));
@@ -275,13 +274,13 @@ public class TimelineFragment extends Fragment {
                                 event.setCategoryName(dataObj.getString("category_name"));
                                 event.setLocation(dataObj.getString("location_name"));
                                 event.setPhotoUrl(dataObj.getString("event_photo"));
-                                if(dataObj.getBoolean("is_favorited"))
+                                if (dataObj.getBoolean("is_favorited"))
                                     event.setIsFavorite(1);
                                 else
                                     event.setIsFavorite(0);
                                 event.setFavoriteCount(dataObj.getInt("sum_favorite"));
                                 event.setFirstName(dataObj.getString("account_username"));
-                                if(dataObj.has("event_caption") && !dataObj.isNull("event_caption"))
+                                if (dataObj.has("event_caption") && !dataObj.isNull("event_caption"))
                                     event.setCaption(dataObj.getString("event_caption"));
                                 else
                                     event.setCaption("");
@@ -319,7 +318,7 @@ public class TimelineFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray dataArr = response.getJSONArray("data");
-                            for(int i=0;i<dataArr.length();i++) {
+                            for (int i = 0; i < dataArr.length(); i++) {
                                 Comment comment = new Comment();
                                 JSONObject dataObj = dataArr.getJSONObject(i);
                                 comment.setEventId(dataObj.getInt("event_id"));

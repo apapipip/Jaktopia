@@ -22,10 +22,10 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        toolbar = (Toolbar)findViewById(R.id.home_toolbar);
-        toolbarTitle = (TextView)findViewById(R.id.home_title);
-        tabLayout = (TabLayout)findViewById(R.id.home_tab_layout);
-        viewPager = (ViewPager)findViewById(R.id.home_view_pager);
+        toolbar = (Toolbar) findViewById(R.id.home_toolbar);
+        toolbarTitle = (TextView) findViewById(R.id.home_title);
+        tabLayout = (TabLayout) findViewById(R.id.home_tab_layout);
+        viewPager = (ViewPager) findViewById(R.id.home_view_pager);
         viewPager.setOffscreenPageLimit(0);
 
         /* ===================== */
@@ -69,19 +69,16 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                if(tab.getPosition() == 0) {
+                if (tab.getPosition() == 0) {
                     tab.setIcon(R.drawable.ic_home_onclick);
                     toolbarTitle.setText("HOME");
-                }
-                else if(tab.getPosition() == 1) {
+                } else if (tab.getPosition() == 1) {
                     tab.setIcon(R.drawable.ic_map_onclick);
                     toolbarTitle.setText("MAP");
-                }
-                else if(tab.getPosition() == 2) {
+                } else if (tab.getPosition() == 2) {
                     tab.setIcon(R.drawable.ic_profile_onclick);
                     toolbarTitle.setText("PROFILE");
-                }
-                else if(tab.getPosition() == 3) {
+                } else if (tab.getPosition() == 3) {
                     tab.setIcon(R.drawable.ic_comingsoon_onclick);
                     toolbarTitle.setText("COMING SOON");
                 }
@@ -89,10 +86,10 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                if(tab.getPosition() == 0) tab.setIcon(R.drawable.ic_home_unclicked);
-                else if(tab.getPosition() == 1) tab.setIcon(R.drawable.ic_map_unclicked);
-                else if(tab.getPosition() == 2) tab.setIcon(R.drawable.ic_profile_unclicked);
-                else if(tab.getPosition() == 3) tab.setIcon(R.drawable.ic_comingsoon_unclicked);
+                if (tab.getPosition() == 0) tab.setIcon(R.drawable.ic_home_unclicked);
+                else if (tab.getPosition() == 1) tab.setIcon(R.drawable.ic_map_unclicked);
+                else if (tab.getPosition() == 2) tab.setIcon(R.drawable.ic_profile_unclicked);
+                else if (tab.getPosition() == 3) tab.setIcon(R.drawable.ic_comingsoon_unclicked);
             }
 
             @Override
@@ -100,5 +97,10 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 }

@@ -1,16 +1,17 @@
-package com.jaktopia.tiramisu.jaktopia;
+package com.jaktopia.tiramisu.jaktopia.HomeActivityFragment;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -28,8 +29,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.jaktopia.tiramisu.jaktopia.GPSTracker.GPSTracker;
 import com.jaktopia.tiramisu.jaktopia.Interface.IVolleyCallBack;
 import com.jaktopia.tiramisu.jaktopia.ObjectClass.MapData;
+import com.jaktopia.tiramisu.jaktopia.R;
+import com.jaktopia.tiramisu.jaktopia.SettingActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,9 +49,17 @@ import java.util.List;
 public class MapEventFragment extends Fragment {
     Context mContext;
     List<MapData> mapDatas = new ArrayList<MapData>();
+    List<Boolean> selectedCategoryId = new ArrayList<Boolean>();
 
     MapView mapView;
     GoogleMap googleMap;
+    TextView chosenCategoryTxt;
+    Button foodBtn;
+    Button accidentBtn;
+    Button educationBtn;
+    Button sportBtn;
+    Button trafficBtn;
+    Button entertainmentBtn;
 
     GPSTracker gpsTracker;
     double userLatitude;
@@ -66,7 +78,68 @@ public class MapEventFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_map_layout, container, false);
-        mapView = (MapView)view.findViewById(R.id.map_map_view);
+        mapView = (MapView) view.findViewById(R.id.map_map_view);
+        chosenCategoryTxt = (TextView) view.findViewById(R.id.map_chosen_category);
+        foodBtn = (Button) view.findViewById(R.id.map_food_button);
+        accidentBtn = (Button) view.findViewById(R.id.map_accident_button);
+        educationBtn = (Button) view.findViewById(R.id.map_education_button);
+        sportBtn = (Button) view.findViewById(R.id.map_sport_button);
+        trafficBtn = (Button) view.findViewById(R.id.map_traffic_button);
+        entertainmentBtn = (Button) view.findViewById(R.id.map_entertainment_button);
+
+        /* initialize selected category */
+        initSelectedCategory();
+
+        /* set onClickListener for each category button */
+        foodBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedCategoryId.set(1, !selectedCategoryId.get(1));
+                showEventMarker();
+            }
+        });
+
+        accidentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedCategoryId.set(0, !selectedCategoryId.get(0));
+                showEventMarker();
+            }
+        });
+
+        educationBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedCategoryId.set(5, !selectedCategoryId.get(5));
+                showEventMarker();
+            }
+        });
+
+        sportBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedCategoryId.set(2, !selectedCategoryId.get(2));
+                showEventMarker();
+            }
+        });
+
+        trafficBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedCategoryId.set(3, !selectedCategoryId.get(3));
+                showEventMarker();
+            }
+        });
+
+        entertainmentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedCategoryId.set(4, !selectedCategoryId.get(4));
+                showEventMarker();
+            }
+        });
+
+
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
         try {
@@ -79,38 +152,7 @@ public class MapEventFragment extends Fragment {
         volleyCallBack = new IVolleyCallBack() {
             @Override
             public void onSuccess() {
-                mapView.getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(GoogleMap map) {
-                        googleMap = map;
-                        googleMap.clear();
-                        googleMap.addMarker(new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("My location"));
-                        CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(userLatitude, userLongitude)).zoom(12).build();
-                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-                        for(int i=0;i<mapDatas.size();i++) {
-                            //Log.e("lat:", mapDatas.get(i).getLatitude()+" at " + i);
-                            //Log.e("long:", mapDatas.get(i).getLongitude()+" at " + i);
-                            //Log.e("name", mapDatas.get(i).getEventName());
-                            BitmapDescriptor bitmapDescriptor;
-                            if(mapDatas.get(i).getEventName().equals("Food")){
-                                bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_food);
-                            } else if(mapDatas.get(i).getEventName().equals("Accident")){
-                                bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_accident);
-                            } else if(mapDatas.get(i).getEventName().equals("Education")){
-                                bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_education);
-                            } else if(mapDatas.get(i).getEventName().equals("Sport")){
-                                bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_sport);
-                            } else if(mapDatas.get(i).getEventName().equals("Traffic")){
-                                bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_traffic);
-                            } else {
-                                bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_entertainment);
-                            }
-                            googleMap.addMarker(new MarkerOptions().position(new LatLng(mapDatas.get(i).getLatitude(), mapDatas.get(i).getLongitude())).
-                                    title(mapDatas.get(i).getEventName()).snippet(mapDatas.get(i).getCategoryName()).icon(bitmapDescriptor));
-                        }
-                    }
-                });
+                showEventMarker();
             }
 
             @Override
@@ -120,7 +162,7 @@ public class MapEventFragment extends Fragment {
         };
 
         gpsTracker = new GPSTracker(mContext);
-        if(gpsTracker.isCanGetLocation()) {
+        if (gpsTracker.isCanGetLocation()) {
             userLatitude = gpsTracker.getLatitude();
             userLongitude = gpsTracker.getLongitude();
         } else {
@@ -133,7 +175,7 @@ public class MapEventFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(gpsTracker.isCanGetLocation()) {
+        if (gpsTracker.isCanGetLocation()) {
             userLatitude = gpsTracker.getLatitude();
             userLongitude = gpsTracker.getLongitude();
         } else {
@@ -159,7 +201,7 @@ public class MapEventFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.timeline_setting_menu) {
+        if (id == R.id.timeline_setting_menu) {
             Intent intent = new Intent(mContext, SettingActivity.class);
             startActivity(intent);
         }
@@ -175,7 +217,7 @@ public class MapEventFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray dataArr = response.getJSONArray("data");
-                            for(int i=0;i<dataArr.length();i++) {
+                            for (int i = 0; i < dataArr.length(); i++) {
                                 MapData mapData = new MapData();
                                 JSONObject dataObj = dataArr.getJSONObject(i);
                                 mapData.setCategoryId(dataObj.getInt("event_id"));
@@ -187,8 +229,6 @@ public class MapEventFragment extends Fragment {
                                 mapData.setLongitude(dataObj.getDouble("location_longitude"));
 
                                 mapDatas.add(mapData);
-                                //Log.e("lat:", mapDatas.get(i).getLatitude()+" at " + i);
-                                //Log.e("long:", mapDatas.get(i).getLongitude()+" at " + i);
                             }
                             volleyCallBack.onSuccess();
                         } catch (JSONException e) {
@@ -205,4 +245,46 @@ public class MapEventFragment extends Fragment {
         );
         requestQueue.add(objectRequest);
     }
+
+    private void showEventMarker() {
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap map) {
+                googleMap = map;
+                googleMap.clear();
+                googleMap.addMarker(new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("My location"));
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(userLatitude, userLongitude)).zoom(12).build();
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                for (int i = 0; i < mapDatas.size(); i++) {
+                    if (selectedCategoryId.get(mapDatas.get(i).getCategoryId() - 1)) {
+                        BitmapDescriptor bitmapDescriptor;
+                        if (mapDatas.get(i).getCategoryName().equals("Food")) {
+                            bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_food);
+                        } else if (mapDatas.get(i).getCategoryName().equals("Accident")) {
+                            bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_accident);
+                        } else if (mapDatas.get(i).getCategoryName().equals("Education")) {
+                            bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_education);
+                        } else if (mapDatas.get(i).getCategoryName().equals("Sport")) {
+                            bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_sport);
+                        } else if (mapDatas.get(i).getCategoryName().equals("Traffic")) {
+                            bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_traffic);
+                        } else {
+                            bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.ic_marker_entertainment);
+                        }
+                        googleMap.addMarker(new MarkerOptions().position(new LatLng(mapDatas.get(i).getLatitude(), mapDatas.get(i).getLongitude())).
+                                title(mapDatas.get(i).getEventName()).snippet(mapDatas.get(i).getCategoryName()).icon(bitmapDescriptor));
+                    }
+                }
+            }
+        });
+    }
+
+    private void initSelectedCategory() {
+        /* set true for all 6 category */
+        for (int i = 0; i < 6; i++) {
+            selectedCategoryId.add(true);
+        }
+    }
+
 }

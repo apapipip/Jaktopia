@@ -15,11 +15,11 @@
         <activity android:name=".HomeActivity" />
         <activity android:name=".CommentActivity" />
         <activity android:name=".SettingActivity" />
-        <activity
-            android:name=".PostEventActivity"
-            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".PostEventActivity" />
         <activity android:name=".PeekProfileActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,6 +30,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyD1bFKypSYXCLz1cEMM-TGfSJfPqVgWPUM" />
+
     </application>
 
 </manifest>

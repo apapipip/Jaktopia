@@ -57,11 +57,11 @@ public class CommentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
 
-        toolbar = (Toolbar)findViewById(R.id.comment_toolbar);
-        insertCommentEdt = (EditText)findViewById(R.id.comment_insert_comment_box);
-        postCommentBtn = (Button)findViewById(R.id.comment_post_button);
-        progressBar = (ProgressBar)findViewById(R.id.comment_progress_bar);
-        recyclerView = (RecyclerView)findViewById(R.id.comment_recycler_view);
+        toolbar = (Toolbar) findViewById(R.id.comment_toolbar);
+        insertCommentEdt = (EditText) findViewById(R.id.comment_insert_comment_box);
+        postCommentBtn = (Button) findViewById(R.id.comment_post_button);
+        progressBar = (ProgressBar) findViewById(R.id.comment_progress_bar);
+        recyclerView = (RecyclerView) findViewById(R.id.comment_recycler_view);
 
         /* get user id value from sharedpref */
         SharedPreferences sharedPreferences = getSharedPreferences("UserProfileData", MODE_PRIVATE);
@@ -94,7 +94,7 @@ public class CommentActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
                 insertCommentEdt.getText().clear();
-                //recyclerView.scrollToPosition(comments.size()-1);
+                recyclerView.scrollToPosition(comments.size() - 1);
 
                 commentRecyclerAdapter.setComments(new ArrayList<Comment>(comments));
                 commentRecyclerAdapter.notifyDataSetChanged();
@@ -116,7 +116,7 @@ public class CommentActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }
@@ -128,7 +128,7 @@ public class CommentActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
 
-        commentGetReqUrl = "https://aegis.web.id/jaktopia/api/v1/comment/"+ eventId;
+        commentGetReqUrl = "https://aegis.web.id/jaktopia/api/v1/comment/" + eventId;
         requestQueue = Volley.newRequestQueue(this);
         JsonObjectRequest objectRequest = new JsonObjectRequest(Request.Method.GET, commentGetReqUrl, null,
                 new Response.Listener<JSONObject>() {
@@ -138,12 +138,12 @@ public class CommentActivity extends AppCompatActivity {
                             JSONObject dataObj = response.getJSONObject("data");
                             JSONArray commentDataArr = dataObj.getJSONArray("comments");
                             JSONArray eventDataArr = dataObj.getJSONArray("event");
-                            for(int i=0;i<eventDataArr.length();i++) {
+                            for (int i = 0; i < eventDataArr.length(); i++) {
                                 JSONObject eventDataObj = eventDataArr.getJSONObject(i);
                                 Comment comment = new Comment();
                                 comment.setUserId(eventDataObj.getInt("account_id"));
                                 comment.setUsername(eventDataObj.getString("account_name"));
-                                if(eventDataObj.has("event_caption") && !eventDataObj.isNull("event_caption"))
+                                if (eventDataObj.has("event_caption") && !eventDataObj.isNull("event_caption"))
                                     comment.setContent(eventDataObj.getString("event_caption"));
                                 else
                                     comment.setContent("");
@@ -151,7 +151,7 @@ public class CommentActivity extends AppCompatActivity {
                                 //comment.setPostTime(Long.parseLong(eventDataObj.getString("event_time")));
                                 comments.add(comment);
                             }
-                            for(int i = 0; i< commentDataArr.length(); i++) {
+                            for (int i = 0; i < commentDataArr.length(); i++) {
                                 JSONObject commentDataObj = commentDataArr.getJSONObject(i);
                                 Comment comment = new Comment();
                                 comment.setUserId(commentDataObj.getInt("account_id"));
@@ -204,7 +204,7 @@ public class CommentActivity extends AppCompatActivity {
                         try {
                             String successStatus = response.getString("success");
                             String message = response.getString("message");
-                            if(successStatus.equals("true")) {
+                            if (successStatus.equals("true")) {
                                 JSONObject dataObj = response.getJSONObject("data");
                                 JSONArray commentDataArr = dataObj.getJSONArray("comments");
                                 JSONArray eventDataArr = dataObj.getJSONArray("event");

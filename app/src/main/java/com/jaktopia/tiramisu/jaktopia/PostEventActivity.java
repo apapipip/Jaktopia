@@ -18,6 +18,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.jaktopia.tiramisu.jaktopia.GPSTracker.GPSTracker;
 import com.jaktopia.tiramisu.jaktopia.Interface.IVolleyCallBack;
 
 import org.json.JSONException;
@@ -54,18 +55,18 @@ public class PostEventActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_event);
 
-        toolbar = (Toolbar)findViewById(R.id.post_event_toolbar);
-        chosenCategoryTxt = (TextView)findViewById(R.id.post_event_chosen_category);
-        foodCategoryBtn = (Button)findViewById(R.id.post_event_food_button);
-        sportCategoryBtn = (Button)findViewById(R.id.post_event_sport_button);
-        educationCategoryBtn = (Button)findViewById(R.id.post_event_education_button);
-        trafficCategoryBtn = (Button)findViewById(R.id.post_event_traffic_button);
-        accidentCategoryBtn = (Button)findViewById(R.id.post_event_accident_button);
-        entertainmentCategoryBtn = (Button)findViewById(R.id.post_event_entertainment_button);
-        eventNameEdt = (EditText)findViewById(R.id.post_event_insert_name);
-        eventDescEdt = (EditText)findViewById(R.id.post_event_insert_description);
-        eventLocationEdt = (EditText)findViewById(R.id.post_event_insert_location);
-        postBtn = (Button)findViewById(R.id.post_event_post_button);
+        toolbar = (Toolbar) findViewById(R.id.post_event_toolbar);
+        chosenCategoryTxt = (TextView) findViewById(R.id.post_event_chosen_category);
+        foodCategoryBtn = (Button) findViewById(R.id.map_food_button);
+        sportCategoryBtn = (Button) findViewById(R.id.map_sport_button);
+        educationCategoryBtn = (Button) findViewById(R.id.map_education_button);
+        trafficCategoryBtn = (Button) findViewById(R.id.map_traffic_button);
+        accidentCategoryBtn = (Button) findViewById(R.id.map_accident_button);
+        entertainmentCategoryBtn = (Button) findViewById(R.id.map_entertainment_button);
+        eventNameEdt = (EditText) findViewById(R.id.post_event_insert_name);
+        eventDescEdt = (EditText) findViewById(R.id.post_event_insert_description);
+        eventLocationEdt = (EditText) findViewById(R.id.post_event_insert_location);
+        postBtn = (Button) findViewById(R.id.post_event_post_button);
 
         /* get user id value from sharedpref */
         SharedPreferences sharedPreferences = getSharedPreferences("UserProfileData", MODE_PRIVATE);
@@ -87,7 +88,7 @@ public class PostEventActivity extends AppCompatActivity {
         volleyCallBack = new IVolleyCallBack() {
             @Override
             public void onSuccess() {
-               finish();
+                finish();
             }
 
             @Override
@@ -154,7 +155,7 @@ public class PostEventActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 gpsTracker = new GPSTracker(PostEventActivity.this);
-                if(gpsTracker.isCanGetLocation()) {
+                if (gpsTracker.isCanGetLocation()) {
                     userLatitude = gpsTracker.getLatitude();
                     userLongitude = gpsTracker.getLongitude();
                     //Toast.makeText(PostEventActivity.this, "Your location now is Lat : " + gpsTracker.getLatitude()
@@ -173,7 +174,7 @@ public class PostEventActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }
@@ -193,12 +194,12 @@ public class PostEventActivity extends AppCompatActivity {
             eventObj.put("locationLongitude", userLongitude);
             eventObj.put("accountID", 1);
 
-            Log.e("eventName", eventNameEdt.getText()+"");
-            Log.e("eventCaption", eventDescEdt.getText()+"");
-            Log.e("categoryID", chosenCategoryId+"");
-            Log.e("locationName", eventLocationEdt.getText()+"");
-            Log.e("locationLatitude", userLatitude+"");
-            Log.e("locationLongitude", userLongitude+"");
+            Log.e("eventName", eventNameEdt.getText() + "");
+            Log.e("eventCaption", eventDescEdt.getText() + "");
+            Log.e("categoryID", chosenCategoryId + "");
+            Log.e("locationName", eventLocationEdt.getText() + "");
+            Log.e("locationLatitude", userLatitude + "");
+            Log.e("locationLongitude", userLongitude + "");
             Log.e("accountID", userId);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -213,7 +214,7 @@ public class PostEventActivity extends AppCompatActivity {
                         try {
                             String successStatus = response.getString("success");
                             String message = response.getString("message");
-                            if(successStatus.equals("true")) {
+                            if (successStatus.equals("true")) {
                                 volleyCallBack.onSuccess();
                             } else {
                                 volleyCallBack.onFailed();

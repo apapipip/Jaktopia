@@ -1,5 +1,6 @@
 package com.jaktopia.tiramisu.jaktopia;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -25,31 +26,37 @@ public class LoginActivity extends AppCompatActivity {
     EditText emailEdt;
     EditText passwordEdt;
     Button signInBtn;
-    Button signOutBtn;
+    Button signUpBtn;
 
     String loginUrl;
     RequestQueue requestQueue;
     IVolleyCallBack volleyCallBack;
+
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        emailEdt = (EditText)findViewById(R.id.login_insert_email);
-        passwordEdt = (EditText)findViewById(R.id.login_insert_password);
-        signInBtn = (Button)findViewById(R.id.login_sign_in_button);
-        signOutBtn = (Button)findViewById(R.id.login_sign_up_button);
+        emailEdt = (EditText) findViewById(R.id.login_insert_email);
+        passwordEdt = (EditText) findViewById(R.id.login_insert_password);
+        signInBtn = (Button) findViewById(R.id.login_sign_in_button);
+        signUpBtn = (Button) findViewById(R.id.login_sign_up_button);
 
         volleyCallBack = new IVolleyCallBack() {
             @Override
             public void onSuccess() {
+                if (progressDialog.isShowing())
+                    progressDialog.dismiss();
                 Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                 startActivity(intent);
             }
 
             @Override
             public void onFailed() {
+                if (progressDialog.isShowing())
+                    progressDialog.dismiss();
                 passwordEdt.getText().clear();
             }
         };
@@ -58,8 +65,22 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 login(volleyCallBack);
+                progressDialog = ProgressDialog.show(LoginActivity.this, "", "Signing in...", true);
             }
         });
+
+        signUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
     }
 
     private void login(final IVolleyCallBack volleyCallBack) {
@@ -80,9 +101,9 @@ public class LoginActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         try {
                             String message = response.getString("message");
-                            if(message.equals("Success to login")) {
+                            if (message.equals("Success to login")) {
                                 JSONArray dataArr = response.getJSONArray("data");
-                                for (int i=0; i<dataArr.length(); i++) {
+                                for (int i = 0; i < dataArr.length(); i++) {
                                     JSONObject dataObj = dataArr.getJSONObject(i);
                                     SharedPreferences.Editor editor = getSharedPreferences("UserProfileData", MODE_PRIVATE).edit();
                                     editor.putString("userId", dataObj.getString("account_id"));

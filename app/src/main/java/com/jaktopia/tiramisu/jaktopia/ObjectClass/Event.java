@@ -12,8 +12,8 @@ import java.util.Map;
  */
 
 public class Event implements Parcelable {
-    int userId;
-    int eventId;
+    private int userId;
+    private int eventId;
     String userIconUrl;
     String eventName;
     String categoryName;
@@ -43,7 +43,7 @@ public class Event implements Parcelable {
         firstName = source.readString();
         caption = source.readString();
         final int N = source.readInt();
-        for(int i=0;i<N;i++) {
+        for (int i = 0; i < N; i++) {
             String key = source.readString();
             String value = source.readString();
             lastComment.put(key, value);
@@ -183,7 +183,7 @@ public class Event implements Parcelable {
         dest.writeString(firstName);
         dest.writeString(caption);
         final int N = lastComment.size();
-        if(N>0)
+        if (N > 0)
             for (Map.Entry<String, String> entry : lastComment.entrySet()) {
                 dest.writeString(entry.getKey());
                 dest.writeString(entry.getValue());

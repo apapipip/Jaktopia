@@ -1,4 +1,4 @@
-package com.jaktopia.tiramisu.jaktopia;
+package com.jaktopia.tiramisu.jaktopia.GPSTracker;
 
 import android.app.AlertDialog;
 import android.app.Service;

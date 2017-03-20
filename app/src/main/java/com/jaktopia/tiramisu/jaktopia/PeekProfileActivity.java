@@ -41,7 +41,7 @@ public class PeekProfileActivity extends AppCompatActivity {
     ProgressBar progressBar;
 
     int userId;
-    ProfileInfo userInfo;
+    ProfileInfo userInfo = new ProfileInfo();
     List<Event> events = new ArrayList<Event>();
     List<Comment> lastComments = new ArrayList<Comment>();
 
@@ -55,10 +55,10 @@ public class PeekProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_peek_profile);
 
-        refreshLyt = (SwipeRefreshLayout)findViewById(R.id.peek_profile_refresh_layout);
-        toolbar = (Toolbar)findViewById(R.id.peek_profile_toolbar);
-        recyclerView = (RecyclerView)findViewById(R.id.peek_profile_recycler_view);
-        progressBar = (ProgressBar)findViewById(R.id.peek_profile_progress_bar);
+        refreshLyt = (SwipeRefreshLayout) findViewById(R.id.peek_profile_refresh_layout);
+        toolbar = (Toolbar) findViewById(R.id.peek_profile_toolbar);
+        recyclerView = (RecyclerView) findViewById(R.id.peek_profile_recycler_view);
+        progressBar = (ProgressBar) findViewById(R.id.peek_profile_progress_bar);
 
         /* set toolbar element */
         toolbar.setTitle("");
@@ -119,7 +119,7 @@ public class PeekProfileActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }
@@ -144,8 +144,8 @@ public class PeekProfileActivity extends AppCompatActivity {
                             JSONObject dataObj = response.getJSONObject("data");
                             JSONArray eventDataArr = dataObj.getJSONArray("events");
                             JSONArray profileDataArr = dataObj.getJSONArray("profile");
-                            for(int i=0;i<profileDataArr.length();i++) {
-                                userInfo = new ProfileInfo();
+                            for (int i = 0; i < profileDataArr.length(); i++) {
+                                //userInfo = new ProfileInfo();
                                 JSONObject profileDataObj = profileDataArr.getJSONObject(i);
                                 userInfo.setUserFullName(profileDataObj.getString("account_username"));
                                 userInfo.setUserIconUrl(profileDataObj.getString("account_photo"));
@@ -153,7 +153,7 @@ public class PeekProfileActivity extends AppCompatActivity {
                                 userInfo.setUserPostCount(Integer.parseInt(profileDataObj.getString("sum_events")));
                             }
 
-                            for(int i = 0; i< eventDataArr.length(); i++) {
+                            for (int i = 0; i < eventDataArr.length(); i++) {
                                 Event event = new Event();
                                 JSONObject eventDataObj = eventDataArr.getJSONObject(i);
                                 event.setUserId(eventDataObj.getInt("account_id"));
@@ -163,13 +163,13 @@ public class PeekProfileActivity extends AppCompatActivity {
                                 event.setCategoryName(eventDataObj.getString("category_name"));
                                 event.setLocation(eventDataObj.getString("location_name"));
                                 event.setPhotoUrl(eventDataObj.getString("event_photo"));
-                                if(eventDataObj.getBoolean("is_favorited"))
+                                if (eventDataObj.getBoolean("is_favorited"))
                                     event.setIsFavorite(1);
                                 else
                                     event.setIsFavorite(0);
                                 event.setFavoriteCount(eventDataObj.getInt("sum_favorite"));
                                 event.setFirstName(eventDataObj.getString("account_username"));
-                                if(eventDataObj.has("event_caption") && !eventDataObj.isNull("event_caption"))
+                                if (eventDataObj.has("event_caption") && !eventDataObj.isNull("event_caption"))
                                     event.setCaption(eventDataObj.getString("event_caption"));
                                 else
                                     event.setCaption("");
@@ -207,7 +207,7 @@ public class PeekProfileActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray dataArr = response.getJSONArray("data");
-                            for(int i=0;i<dataArr.length();i++) {
+                            for (int i = 0; i < dataArr.length(); i++) {
                                 Comment comment = new Comment();
                                 JSONObject dataObj = dataArr.getJSONObject(i);
                                 comment.setEventId(dataObj.getInt("event_id"));

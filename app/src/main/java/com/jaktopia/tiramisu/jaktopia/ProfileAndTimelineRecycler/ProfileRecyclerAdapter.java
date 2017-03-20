@@ -81,8 +81,11 @@ public class ProfileRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
         if(holder instanceof VHProfileHeader) {
             VHProfileHeader vhProfileHeader = (VHProfileHeader)holder;
-            if(userInfo.getUserIconUrl() != "null")
-                Picasso.with(mContext).load(userInfo.getUserIconUrl()).into(vhProfileHeader.userIconImg);
+            //if(userInfo == null) Log.e("adkjhaskdhaskdhas", "null");
+            if(!userInfo.getUserIconUrl().equals("null"))
+                Picasso.with(mContext).load(userInfo.getUserIconUrl()).placeholder(R.drawable.image_placeholder).
+                        error(R.drawable.image_placeholder).
+                        into(vhProfileHeader.userIconImg);
             vhProfileHeader.usernameTxt.setText(userInfo.getUserFullName());
             vhProfileHeader.userInfoTxt.setText(userInfo.getUserInfo());
             vhProfileHeader.userPostCountTxt.setText(userInfo.getUserPostCount()+" events");

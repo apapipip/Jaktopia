@@ -1,21 +1,13 @@
 package com.jaktopia.tiramisu.jaktopia.PagerAdapter;
 
-import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.jaktopia.tiramisu.jaktopia.MapEventFragment;
-import com.jaktopia.tiramisu.jaktopia.ObjectClass.Event;
-import com.jaktopia.tiramisu.jaktopia.ObjectClass.ProfileInfo;
-import com.jaktopia.tiramisu.jaktopia.TimelineFragment;
-import com.jaktopia.tiramisu.jaktopia.UpcomingEventFragment;
-import com.jaktopia.tiramisu.jaktopia.UserProfileFragment;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import com.jaktopia.tiramisu.jaktopia.HomeActivityFragment.MapEventFragment;
+import com.jaktopia.tiramisu.jaktopia.HomeActivityFragment.TimelineFragment;
+import com.jaktopia.tiramisu.jaktopia.HomeActivityFragment.UpcomingEventFragment;
+import com.jaktopia.tiramisu.jaktopia.HomeActivityFragment.UserProfileFragment;
 
 /**
  * Created by lsoehadak on 2/17/17.
